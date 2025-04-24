@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图书统计图表</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 30px;
+            display: flex;
+            border: 3px solid #1e90ff;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(30, 144, 255, 0.3);
+            background-color: #fff;
+        }
+        .chart-container {
+            width: 50%;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .data-container {
+            width: 50%;
+            padding: 20px;
+            font-size: 1.2em;
+        }
+        .question-container {
+            margin-top: 20px;
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input {
+            width: 60px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="myChart"></canvas>
+    </div>
+    <div class="data-container">
+        <h2>本班同学喜爱图书类型统计</h2>
+        <table id="dataTable">
+            <tr>
+                <th>类别</th>
+                <th>游戏益智</th>
+                <th>少儿文学</th>
+                <th>科普百科</th>
+                <th>卡通漫画</th>
+            </tr>
+            <tr>
+                <td>数量</td>
+                <td><input type="number" id="game" value="0"></td>
+                <td><input type="number" id="literature" value="0"></td>
+                <td><input type="number" id="science" value="0"></td>
+                <td><input type="number" id="cartoon" value="0"></td>
+            </tr>
+        </table>
+        <button onclick="updateChart()">更新图表</button>
+        <div class="question-container">
+            <p>左图是我们班同学喜欢的图书类型数量。</p>
+            <p>请根据统计图回答以下问题：</p>
+            <p>（1）喜欢_____的同学最多。</p>
+            <p>（2）喜欢游戏益智和科普百科的同学共有____名。</p>
+            <p>（3）如果哪吒想拜托你去准备回礼，你怎么买？说说你的想法。</p>
+        </div>
+    </div>
+
+    <script>
+        let myChart;
+        
+        function initChart() {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['游戏益智', '少儿文学', '科普百科', '卡通漫画'],
+                    datasets: [{
+                        label: '本班同学喜爱图书类型统计',
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                font: {
+                                    size: 16
+                                }
+                            },
+                            title: {
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: {
+                                    size: 16
+                                }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#000',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 5,
+                            formatter: function(value) {
+                                return value;
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            }
+                        },
+                        datalabels: {
+                            display: true,
+                            color: '#000',
+                            anchor: 'end',
+                            align: 'top',
+                            offset: 5,
+                            formatter: function(value) {
+                                return value;
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 16
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateChart() {
+            const game = parseInt(document.getElementById('game').value) || 0;
+            const literature = parseInt(document.getElementById('literature').value) || 0;
+            const science = parseInt(document.getElementById('science').value) || 0;
+            const cartoon = parseInt(document.getElementById('cartoon').value) || 0;
+            
+            myChart.data.datasets[0].data = [game, literature, science, cartoon];
+            myChart.update();
+        }
+        
+        window.onload = initChart;
+    </script>
+</body>
+</html>
