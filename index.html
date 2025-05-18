@@ -82,6 +82,7 @@
             </tr>
         </table>
         <button onclick="updateChart()">更新图表</button>
+        <button onclick="toggleChartOrientation()">切换图表方向</button>
         <div class="question-container">
             <p>左图是我们班同学喜欢的图书类型数量。</p>
             <p>请根据统计图回答以下问题：</p>
@@ -122,6 +123,7 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            suggestedMax: 10,
                             ticks: {
                                 stepSize: 1,
                                 font: {
@@ -194,7 +196,96 @@
             const cartoon = parseInt(document.getElementById('cartoon').value) || 0;
             
             myChart.data.datasets[0].data = [game, literature, science, cartoon];
+            
+            // 自动调整y轴刻度
+            const maxValue = Math.max(game, literature, science, cartoon);
+            if(maxValue > 10) {
+                myChart.options.scales.y.suggestedMax = Math.ceil(maxValue * 1.1);
+            } else {
+                myChart.options.scales.y.suggestedMax = 10;
+            }
+            
             myChart.update();
+        }
+        
+        function toggleChartOrientation() {
+            myChart.destroy();
+            const ctx = document.getElementById('myChart').getContext('2d');
+            
+            // 切换x和y轴的配置
+            const options = {
+                indexAxis: myChart.options.indexAxis === 'y' ? 'x' : 'y',
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,
+                            font: {
+                                size: 16
+                            }
+                        },
+                        title: {
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            font: {
+                                size: 16
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            font: {
+                                size: 16
+                            }
+                        }
+                    },
+                    tooltip: {
+                        enabled: true
+                    },
+                    datalabels: {
+                        display: true,
+                        color: '#000',
+                        anchor: 'end',
+                        align: 'top',
+                        offset: 5,
+                        formatter: function(value) {
+                            return value;
+                        },
+                        font: {
+                            weight: 'bold',
+                            size: 16
+                        }
+                    },
+                    chartDataLabels: {
+                        display: true,
+                        color: '#000',
+                        anchor: 'center',
+                        align: 'top',
+                        offset: 5,
+                        formatter: function(value) {
+                            return value;
+                        },
+                        font: {
+                            weight: 'bold',
+                            size: 16
+                        }
+                    }
+                }
+            };
+            
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: myChart.data,
+                options: options
+            });
         }
         
         window.onload = initChart;
