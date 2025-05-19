@@ -22,7 +22,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
         }
         .data-container {
             width: 50%;
@@ -80,9 +79,28 @@
                 <td><input type="number" id="science" value="0"></td>
                 <td><input type="number" id="cartoon" value="0"></td>
             </tr>
+            <tr class="additional-categories" style="display:none">
+                <th>类别</th>
+                <th>悬疑小说</th>
+                <th>文学经典</th>
+                <th>历史传记</th>
+                <th>艺术设计</th>
+                <th>经济管理</th>
+                <th>宗教哲学</th>
+            </tr>
+            <tr class="additional-categories" style="display:none">
+                <td>数量</td>
+                <td><input type="number" id="mystery" value="0"></td>
+                <td><input type="number" id="classic" value="0"></td>
+                <td><input type="number" id="history" value="0"></td>
+                <td><input type="number" id="art" value="0"></td>
+                <td><input type="number" id="economics" value="0"></td>
+                <td><input type="number" id="philosophy" value="0"></td>
+            </tr>
         </table>
         <button onclick="updateChart()">更新图表</button>
         <button onclick="toggleChartOrientation()">切换图表方向</button>
+        <button onclick="expandCategories()">扩展类别</button>
         <div class="question-container">
             <p>左图是我们班同学喜欢的图书类型数量。</p>
             <p>请根据统计图回答以下问题：</p>
@@ -120,6 +138,8 @@
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -190,16 +210,81 @@
         }
         
         function updateChart() {
-            const game = parseInt(document.getElementById('game').value) || 0;
-            const literature = parseInt(document.getElementById('literature').value) || 0;
-            const science = parseInt(document.getElementById('science').value) || 0;
-            const cartoon = parseInt(document.getElementById('cartoon').value) || 0;
-            
-            myChart.data.datasets[0].data = [game, literature, science, cartoon];
+            const additionalCategoriesVisible = document.querySelector('.additional-categories').style.display !== 'none';
+
+            let labels;
+            let data;
+            let backgroundColor;
+            let borderColor;
+
+            if (additionalCategoriesVisible) {
+                labels = ['游戏益智', '少儿文学', '科普百科', '卡通漫画', '悬疑小说', '文学经典', '历史传记', '艺术设计', '经济管理', '宗教哲学'];
+                data = [
+                    parseInt(document.getElementById('game').value) || 0,
+                    parseInt(document.getElementById('literature').value) || 0,
+                    parseInt(document.getElementById('science').value) || 0,
+                    parseInt(document.getElementById('cartoon').value) || 0,
+                    parseInt(document.getElementById('mystery').value) || 0,
+                    parseInt(document.getElementById('classic').value) || 0,
+                    parseInt(document.getElementById('history').value) || 0,
+                    parseInt(document.getElementById('art').value) || 0,
+                    parseInt(document.getElementById('economics').value) || 0,
+                    parseInt(document.getElementById('philosophy').value) || 0
+                ];
+                backgroundColor = [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(199, 199, 199, 0.2)',
+                    'rgba(83, 102, 255, 0.2)',
+                    'rgba(40, 159, 64, 0.2)',
+                    'rgba(210, 99, 132, 0.2)'
+                ];
+                borderColor = [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(199, 199, 199, 1)',
+                    'rgba(83, 102, 255, 1)',
+                    'rgba(40, 159, 64, 1)',
+                    'rgba(210, 99, 132, 1)'
+                ];
+            } else {
+                labels = ['游戏益智', '少儿文学', '科普百科', '卡通漫画'];
+                data = [
+                    parseInt(document.getElementById('game').value) || 0,
+                    parseInt(document.getElementById('literature').value) || 0,
+                    parseInt(document.getElementById('science').value) || 0,
+                    parseInt(document.getElementById('cartoon').value) || 0
+                ];
+                backgroundColor = [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)'
+                ];
+                borderColor = [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ];
+            }
+
+            myChart.data.labels = labels;
+            myChart.data.datasets[0].data = data;
+            myChart.data.datasets[0].backgroundColor = backgroundColor;
+            myChart.data.datasets[0].borderColor = borderColor;
             
             // 自动调整y轴刻度
-            const maxValue = Math.max(game, literature, science, cartoon);
-            if(maxValue > 10) {
+            const maxValue = Math.max(...data);
+            if (maxValue > 10) {
                 myChart.options.scales.y.suggestedMax = Math.ceil(maxValue * 1.1);
             } else {
                 myChart.options.scales.y.suggestedMax = 10;
@@ -214,6 +299,8 @@
             
             // 切换x和y轴的配置
             const options = {
+                responsive: true,
+                maintainAspectRatio: false,
                 indexAxis: myChart.options.indexAxis === 'y' ? 'x' : 'y',
                 scales: {
                     y: {
@@ -286,6 +373,65 @@
                 data: myChart.data,
                 options: options
             });
+        }
+        
+        function expandCategories() {
+            // 显示额外的表格行
+            document.querySelectorAll('.additional-categories').forEach(el => {
+                el.style.display = '';
+            });
+            
+            // 更新图表数据
+            const newLabels = ['游戏益智', '少儿文学', '科普百科', '卡通漫画', '悬疑小说', '文学经典', '历史传记', '艺术设计', '经济管理', '宗教哲学'];
+            const newData = [
+                parseInt(document.getElementById('game').value) || 0,
+                parseInt(document.getElementById('literature').value) || 0,
+                parseInt(document.getElementById('science').value) || 0,
+                parseInt(document.getElementById('cartoon').value) || 0,
+                parseInt(document.getElementById('mystery').value) || 0,
+                parseInt(document.getElementById('classic').value) || 0,
+                parseInt(document.getElementById('history').value) || 0,
+                parseInt(document.getElementById('art').value) || 0,
+                parseInt(document.getElementById('economics').value) || 0,
+                parseInt(document.getElementById('philosophy').value) || 0
+            ];
+
+            const newBackgroundColor = [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+                'rgba(255, 206, 86, 0.2)',
+                'rgba(75, 192, 192, 0.2)',
+                'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)',
+                'rgba(199, 199, 199, 0.2)',
+                'rgba(83, 102, 255, 0.2)',
+                'rgba(40, 159, 64, 0.2)',
+                'rgba(210, 99, 132, 0.2)'
+            ];
+
+            const newBorderColor = [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(255, 206, 86, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)',
+                'rgba(199, 199, 199, 1)',
+                'rgba(83, 102, 255, 1)',
+                'rgba(40, 159, 64, 1)',
+                'rgba(210, 99, 132, 1)'
+            ];
+            
+            myChart.data.labels = newLabels;
+            myChart.data.datasets[0].data = newData;
+            myChart.data.datasets[0].backgroundColor = newBackgroundColor;
+            myChart.data.datasets[0].borderColor = newBorderColor;
+            
+            // 自动调整y轴刻度
+            const maxValue = Math.max(...newData);
+            myChart.options.scales.y.suggestedMax = maxValue > 10 ? Math.ceil(maxValue * 1.1) : 10;
+            
+            myChart.update();
         }
         
         window.onload = initChart;
